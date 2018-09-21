@@ -18,22 +18,25 @@ io.on('connection', (client) => {
 
         usuarios.agregarPersona(client.id, data.nombre, data.sala);
 
-        client.broadcast.to(data.sala).emit('listaPersonas', usuarios.getPersonaPorSala(data.sala));
-
+        client.broadcast.to(data.sala).emit('listaPersona', usuarios.getPersonaPorSala(data.sala));
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${data.nombre} se ha unido al chat`));
         callback(usuarios.getPersonaPorSala(data.sala));
 
     });
 
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
         let persona = usuarios.getPersona(client.id);
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje)
+
+
+        callback(mensaje);
     });
     //Se debe escribir disconnect sino no sirve el 
     client.on('disconnect', () => {
         let personaBorrada = usuarios.borrarPersona(client.id);
-        client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrdor', `${personaBorrada.nombre} ha abandonado el chat`));
-        client.broadcast.to(personaBorrada.sala).emit('listaPersonas', usuarios.getPersonaPorSala(personaBorrada.sala));
+        client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} ha abandonado el chat`));
+        client.broadcast.to(personaBorrada.sala).emit('listaPersona', usuarios.getPersonaPorSala(personaBorrada.sala));
     });
 
     //Mensajes Privados
@@ -42,4 +45,3 @@ io.on('connection', (client) => {
         client.broadcast.to(data.para).emit('mensajePrivado', crearMensaje(persona.nombre, data.mensaje));
     });
 });
-//J7nj0cVyWAAreoHkAAAB
