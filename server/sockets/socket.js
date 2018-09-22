@@ -32,7 +32,7 @@ io.on('connection', (client) => {
 
         callback(mensaje);
     });
-    //Se debe escribir disconnect sino no sirve el 
+    //Se debe escribir disconnect sino no sirve el servicio 
     client.on('disconnect', () => {
         let personaBorrada = usuarios.borrarPersona(client.id);
         client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} ha abandonado el chat`));
